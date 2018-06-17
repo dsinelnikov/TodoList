@@ -8,6 +8,6 @@
   - In Package Management Console run command "Update-Database"
   - Run project
   
-# Difference between swagger specification and current implementation
+# Differences between swagger specification and current implementation
   - use "lists" insted of "list" word in all rest routes
   - use "tasks" insted of "task" word in all rest routes
