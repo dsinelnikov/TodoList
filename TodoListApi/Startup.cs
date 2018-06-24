@@ -34,8 +34,7 @@ namespace TodoListApi
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseErrorHandlingMiddleware(new IExceptionHandler[] {
-                new ItemNotFoundExceptionHandler(),
-                new ItemExistsExceptionHandler(),
+                new DataAccessExceptionHandlers(),
                 new UnhandledExceptionHandler()
             });                  
             app.UseMvc();
