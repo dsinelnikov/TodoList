@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TodoListApi.Filters;
@@ -26,7 +27,7 @@ namespace TodoListApi.Controllers
         [ValidateModel]
         public async Task<IActionResult> Post(Guid id, [FromBody] TodoListTask task)
         {
-            await _listService.AddTaskAsync(id, task);
+            await _listService.AddTaskAsync(id, task, HttpContext.RequestAborted);
 
             return StatusCode(HttpStatusCode.Created);
         }
@@ -35,7 +36,7 @@ namespace TodoListApi.Controllers
         [ValidateModel]
         public async Task<ActionResult<CompletedTask>> Complete(Guid taskId, [FromBody]CompletedTask completedTask)
         {
-            await _listService.CompleteTaskAsync(taskId, completedTask.Completed.Value);
+            await _listService.CompleteTaskAsync(taskId, completedTask.Completed.Value, HttpContext.RequestAborted);
 
             return StatusCode(HttpStatusCode.Created);
         }

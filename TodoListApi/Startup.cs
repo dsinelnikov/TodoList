@@ -24,7 +24,7 @@ namespace TodoListApi
         public void ConfigureServices(IServiceCollection services)
         {
             services                
-                .AddDbContext<ApiDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DbApi")))
+                .AddSingleton<IStorageContext, StorageContext>()
                 .AddTransient<ITodoListService, TodoListService>()
                 .AddAutoMapper()
                 .AddMvc();

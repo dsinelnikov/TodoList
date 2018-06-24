@@ -1,17 +1,17 @@
 using System;
 
-namespace TodoListApi.Exceptions
+namespace TodoListApi.Core.Exceptions
 {
     public class ItemNotFoundException : Exception
     {
-        public Guid Id { get; }
+        public object Id { get; }
 
-        public ItemNotFoundException(Guid id)
+        public ItemNotFoundException(object id)
           : this(id, null)
         {            
         }
 
-        public ItemNotFoundException(Guid id, Exception innerException)
+        public ItemNotFoundException(object id, Exception innerException)
             : base($"Item with Id:{id} is not found.", innerException)
         {
             Id = id;

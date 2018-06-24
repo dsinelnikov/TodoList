@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using TodoListApi.Services;
 using TodoListApi.Models;
 using TodoListApi.Filters;
+using System.Threading;
 
 namespace TodoListApi.Controllers
 {
@@ -22,26 +23,28 @@ namespace TodoListApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoList>>> GetAll(string searchString = "", int skip = 0, int limit = 25, bool includeTasks = false)
         {
-            return await _listService.GetTodoListsAsync(new GetTodoListQuery
+            var lists = await _listService.GetTodoListsAsync(new GetTodoListQuery
             {
-              Offset = skip,
-              Count = limit,
-              Filter = searchString,
-              IncludeTasks = includeTasks
-            });
+                Offset = skip,
+                Count = limit,
+                Filter = searchString,
+                IncludeTasks = includeTasks
+            }, HttpContext.RequestAborted);
+
+            return Ok(lists);                        
         }
 
         [HttpGet("{id}")]        
         public async Task<ActionResult<TodoList>> GetById(Guid id)
         {
-          return await _listService.GetTodoListAsync(id);
+          return await _listService.GetTodoListAsync(id, HttpContext.RequestAborted);
         }
 
         [HttpPost]
         [ValidateModel]
         public async Task<IActionResult> Post([FromBody]TodoList list)
         {
-            await _listService.AddTodoListAsync(list);
+            await _listService.AddTodoListAsync(list, HttpContext.RequestAborted);
 
             return CreatedAtAction(nameof(GetById), new { id = list.Id }, list);
         }

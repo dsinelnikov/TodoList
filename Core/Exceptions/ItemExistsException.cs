@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace TodoListApi.Exceptions
+namespace TodoListApi.Core.Exceptions
 {
     public class ItemExistsException : Exception
     {
-        public Guid? Id { get; }
+        public object Id { get; }
 
         public ItemExistsException(string message, Exception innerException)
             : base(message, innerException)
@@ -18,13 +18,13 @@ namespace TodoListApi.Exceptions
 
         }
 
-        public ItemExistsException(Guid id, Exception innerException)
+        public ItemExistsException(object id, Exception innerException)
             :this($"Item '{id}' is alredy exists.", innerException)
         {
             Id = id;
         }
 
-        public ItemExistsException(Guid id)
+        public ItemExistsException(object id)
             :this(id, null)
         {
 

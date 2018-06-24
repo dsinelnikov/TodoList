@@ -14,4 +14,9 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\InMemoryStorage\InMemoryStorage.csproj" />
+  </ItemGroup>
+
 </Project>
