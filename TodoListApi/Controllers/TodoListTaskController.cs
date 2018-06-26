@@ -29,7 +29,7 @@ namespace TodoListApi.Controllers
         {
             await _tasksService.AddTaskAsync(id, task, HttpContext.RequestAborted);
 
-            return StatusCode(HttpStatusCode.Created);
+            return StatusCode((int)HttpStatusCode.Created);
         }
 
         [HttpPut("{taskId}/complete")]
@@ -41,7 +41,7 @@ namespace TodoListApi.Controllers
             task.Completed = completedTask.Completed.Value;
             await _tasksService.UpdateTaskAsync(task, HttpContext.RequestAborted);
 
-            return StatusCode(HttpStatusCode.Created);
+            return StatusCode((int)HttpStatusCode.Created);
         }
     }
 }
