@@ -16,27 +16,30 @@ namespace TodoListApi.Controllers
     [Route("lists/{id}/tasks")]
     public class TodoListTaskController : Controller
     {
-        private readonly ITodoListService _listService;
+        private readonly ITodoListTasksService _tasksService;
 
-        public TodoListTaskController(ITodoListService listService)
+        public TodoListTaskController(ITodoListTasksService tasksService)
         {
-            _listService = listService;
+            _tasksService = tasksService;
         }
 
         [HttpPost]
         [ValidateModel]
         public async Task<IActionResult> Post(Guid id, [FromBody] TodoListTask task)
         {
-            await _listService.AddTaskAsync(id, task, HttpContext.RequestAborted);
+            await _tasksService.AddTaskAsync(id, task, HttpContext.RequestAborted);
 
             return StatusCode(HttpStatusCode.Created);
         }
 
-        [HttpPost("{taskId}/complete")]
+        [HttpPut("{taskId}/complete")]
         [ValidateModel]
         public async Task<ActionResult<CompletedTask>> Complete(Guid taskId, [FromBody]CompletedTask completedTask)
         {
-            await _listService.CompleteTaskAsync(taskId, completedTask.Completed.Value, HttpContext.RequestAborted);
+            var task = await _tasksService.GetTaskAsync(taskId, HttpContext.RequestAborted);
+
+            task.Completed = completedTask.Completed.Value;
+            await _tasksService.UpdateTaskAsync(task, HttpContext.RequestAborted);
 
             return StatusCode(HttpStatusCode.Created);
         }

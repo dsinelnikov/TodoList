@@ -1,7 +1,3 @@
 ﻿/.vs
-/Core/bin
-/Core/obj
-/InMemoryStorage/bin
-/InMemoryStorage/obj
-/TodoListApi/bin
-/TodoListApi/obj
+bin/
+obj/

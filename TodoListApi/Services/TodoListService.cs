@@ -106,31 +106,5 @@ namespace TodoListApi.Services
                 }
             }
         }
-
-        public async Task AddTaskAsync(Guid listId, TodoListTask task, CancellationToken cancelationToken)
-        {
-            var dseList = await _storageContext.TodoLists.Get(listId, cancelationToken);
-            if(dseList == null)
-            {
-                throw new ItemNotFoundException(listId);
-            }
-
-            var dseTask = _mapper.Map<Dse.TodoListTask>(task);
-            dseTask.ListId = listId;
-            await _storageContext.Tasks.Add(dseTask, cancelationToken);            
-        }
-
-        public async Task CompleteTaskAsync(Guid id, bool isCompleted, CancellationToken cancelationToken)
-        {
-            var dseTask = await _storageContext.Tasks.Get(id, cancelationToken);
-            if(dseTask == null)
-            {
-                throw new ItemNotFoundException(id);
-            }
-
-            dseTask.Completed = isCompleted;
-
-            await _storageContext.Tasks.Update(dseTask, cancelationToken);            
-        }
     }
 }

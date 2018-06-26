@@ -4,6 +4,7 @@ using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
 using TodoListApi.Core.Exceptions;
+using System.Diagnostics;
 
 namespace InMemoryStorage
 {
@@ -11,15 +12,16 @@ namespace InMemoryStorage
     public class EntityStorage<TEntity, TKey> : IEntityStorage<TEntity, TKey>
         where TEntity : class, IEntity<TKey>
     {
+        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(15);
         private readonly ReaderWriterLockSlim _accessLock = new ReaderWriterLockSlim();
         private readonly IDictionary<TKey, TEntity> _items = new Dictionary<TKey, TEntity>();
 
-        public async Task Add(TEntity entity, int millisecondsTimeout)
+        public async Task Add(TEntity entity, TimeSpan? timeout)
         {
-            await Add(entity, CancellationToken.None, millisecondsTimeout);
+            await Add(entity, CancellationToken.None, timeout);
         }
 
-        public async Task Add(TEntity entity, CancellationToken cancelationToken, int millisecondsTimeout)
+        public async Task Add(TEntity entity, CancellationToken cancelationToken, TimeSpan? timeout = null)
         {            
             if(entity == null)
             {
@@ -27,7 +29,7 @@ namespace InMemoryStorage
             }
 
             await Task.Run(() => {
-                if (_accessLock.TryEnterWriteLock(millisecondsTimeout))
+                if (_accessLock.TryEnterWriteLock(timeout ?? _defaultTimeout))
                 {
                     try
                     {
@@ -50,21 +52,22 @@ namespace InMemoryStorage
             }, cancelationToken);
         }
 
-        public async Task AddRange(IEnumerable<TEntity> entities, int millisecondsTimeout = 15000)
+        public async Task AddRange(IEnumerable<TEntity> entities, TimeSpan? timeout)
         {
-            await AddRange(entities, CancellationToken.None, millisecondsTimeout);
+            await AddRange(entities, CancellationToken.None, timeout);
         }
 
-        public async Task AddRange(IEnumerable<TEntity> entities, CancellationToken cancelationToken, int millisecondsTimeout = 15000)
+        public async Task AddRange(IEnumerable<TEntity> entities, CancellationToken cancelationToken, TimeSpan? timeout)
         {
             if (entities == null)
             {
                 throw new ArgumentNullException(nameof(entities));
             }
 
-            DateTime startTime = DateTime.Now;
+            var startTime = Stopwatch.StartNew();
+            var operationTimeout = timeout ?? _defaultTimeout;
             await Task.Run(() => {
-                if (_accessLock.TryEnterUpgradeableReadLock(millisecondsTimeout))
+                if (_accessLock.TryEnterUpgradeableReadLock(operationTimeout))
                 {
                     try
                     {
@@ -76,8 +79,8 @@ namespace InMemoryStorage
                         }
 
                         cancelationToken.ThrowIfCancellationRequested();
-                        millisecondsTimeout = GetMillisecondsLeftOrThrow(startTime, millisecondsTimeout);
-                        if (_accessLock.TryEnterWriteLock(millisecondsTimeout))
+                        var currentTimeout = GetTimeoutLeftOrThrow(startTime, operationTimeout);
+                        if (_accessLock.TryEnterWriteLock(currentTimeout))
                         {
                             try
                             {
@@ -108,17 +111,18 @@ namespace InMemoryStorage
             }, cancelationToken);
         }
 
-        public async Task<TEntity> Get(TKey id, int millisecondsTimeout)
+        public async Task<TEntity> Get(TKey id, TimeSpan? timeout = null)
         {
-            return await Get(id, CancellationToken.None, millisecondsTimeout);
+            return await Get(id, CancellationToken.None, timeout);
         }
 
-        public async Task<TEntity> Get(TKey id, CancellationToken cancelationToken, int millisecondsTimeout)
+        public async Task<TEntity> Get(TKey id, CancellationToken cancelationToken, TimeSpan? timeout = null)
         {
-            DateTime startDate = DateTime.Now;
+            var startTime = Stopwatch.StartNew();
+            var operationTimeout = timeout ?? _defaultTimeout;
 
             return await Task.Run(() => {
-                if (_accessLock.TryEnterReadLock(millisecondsTimeout))
+                if (_accessLock.TryEnterReadLock(operationTimeout))
                 {
                     try
                     {
@@ -126,7 +130,7 @@ namespace InMemoryStorage
                         if (_items.TryGetValue(id, out var entity))
                         {
                             cancelationToken.ThrowIfCancellationRequested();
-                            GetMillisecondsLeftOrThrow(startDate, millisecondsTimeout);
+                            GetTimeoutLeftOrThrow(startTime, operationTimeout);
                             return entity;
                         }
                         else
@@ -146,27 +150,28 @@ namespace InMemoryStorage
             }, cancelationToken);            
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll(int millisecondsTimeout = 15000)
+        public async Task<IEnumerable<TEntity>> GetAll(TimeSpan? timeout = null)
         {
-            return await Get(null, CancellationToken.None, millisecondsTimeout);
+            return await Get(null, CancellationToken.None, timeout);
         }
 
-        public async Task<IEnumerable<TEntity>> GetAll(CancellationToken cancelationToken, int millisecondsTimeout = 15000)
+        public async Task<IEnumerable<TEntity>> GetAll(CancellationToken cancelationToken, TimeSpan? timeout = null)
         {
-            return await Get(null, cancelationToken, millisecondsTimeout);
+            return await Get(null, cancelationToken, timeout);
         }
 
-        public async Task<IEnumerable<TEntity>> Get(Func<TEntity, bool> filter, int millisecondsTimeout)
+        public async Task<IEnumerable<TEntity>> Get(Func<TEntity, bool> filter, TimeSpan? timeout = null)
         {
-            return await Get(filter, CancellationToken.None, millisecondsTimeout);
+            return await Get(filter, CancellationToken.None, timeout);
         }
 
-        public async Task<IEnumerable<TEntity>> Get(Func<TEntity, bool> filter, CancellationToken cancelationToken, int millisecondsTimeout)
+        public async Task<IEnumerable<TEntity>> Get(Func<TEntity, bool> filter, CancellationToken cancelationToken, TimeSpan? timeout = null)
         {
-            DateTime startDate = DateTime.Now;
+            var startTime = Stopwatch.StartNew();
+            var operationTimeout = timeout ?? _defaultTimeout;
 
             return await Task.Run(() => {
-                if (_accessLock.TryEnterReadLock(millisecondsTimeout))
+                if (_accessLock.TryEnterReadLock(operationTimeout))
                 {
                     try
                     {
@@ -183,7 +188,7 @@ namespace InMemoryStorage
                         }
 
                         cancelationToken.ThrowIfCancellationRequested();
-                        GetMillisecondsLeftOrThrow(startDate, millisecondsTimeout);
+                        GetTimeoutLeftOrThrow(startTime, operationTimeout);
 
                         return result;
                     }
@@ -199,15 +204,15 @@ namespace InMemoryStorage
             });            
         }
 
-        public async Task<bool> Remove(TKey id, int millisecondsTimeout)
+        public async Task<bool> Remove(TKey id, TimeSpan? timeout = null)
         {
-            return await Remove(id, CancellationToken.None, millisecondsTimeout);
+            return await Remove(id, CancellationToken.None, timeout);
         }
 
-        public async Task<bool> Remove(TKey id, CancellationToken cancelationToken, int millisecondsTimeout)
+        public async Task<bool> Remove(TKey id, CancellationToken cancelationToken, TimeSpan? timeout = null)
         {
             return await Task.Run(() => {
-                if (_accessLock.TryEnterWriteLock(millisecondsTimeout))
+                if (_accessLock.TryEnterWriteLock(timeout ?? _defaultTimeout))
                 {
                     try
                     {
@@ -226,35 +231,37 @@ namespace InMemoryStorage
             });            
         }
 
-        public async Task Update(TEntity entity, int millisecondsTimeout)
+        public async Task Update(TEntity entity, TimeSpan? timeout = null)
         {
-            await Update(entity, CancellationToken.None, millisecondsTimeout);
+            await Update(entity, CancellationToken.None, timeout);
         }
 
-        public async Task Update(TEntity entity, CancellationToken cancelationToken, int millisecondsTimeout)
+        public async Task Update(TEntity entity, CancellationToken cancelationToken, TimeSpan? timeout = null)
         {
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            DateTime startDate = DateTime.Now;
-            await Task.Run(() => {
-                if (_accessLock.TryEnterUpgradeableReadLock(millisecondsTimeout))
-                {
-                    millisecondsTimeout = GetMillisecondsLeftOrThrow(startDate, millisecondsTimeout);
+            var startTime = Stopwatch.StartNew();
+            var operationTimeout = timeout ?? _defaultTimeout;
 
+            await Task.Run(() => {
+                if (_accessLock.TryEnterUpgradeableReadLock(operationTimeout))
+                {
                     try
                     {
+                        var currentTimeout = GetTimeoutLeftOrThrow(startTime, operationTimeout);
                         cancelationToken.ThrowIfCancellationRequested();
+
                         if (_items.ContainsKey(entity.Id))
                         {
-                            if (_accessLock.TryEnterWriteLock(millisecondsTimeout))
+                            currentTimeout = GetTimeoutLeftOrThrow(startTime, operationTimeout);
+                            if (_accessLock.TryEnterWriteLock(currentTimeout))
                             {
                                 try
                                 {
-                                    cancelationToken.ThrowIfCancellationRequested();
-                                    GetMillisecondsLeftOrThrow(startDate, millisecondsTimeout);
+                                    cancelationToken.ThrowIfCancellationRequested();                                    
 
                                     _items[entity.Id] = entity;
                                 }
@@ -281,16 +288,16 @@ namespace InMemoryStorage
             });            
         }
 
-        private static int GetMillisecondsLeftOrThrow(DateTime startDate, int millisecondsTimeout)
+        private static TimeSpan GetTimeoutLeftOrThrow(Stopwatch elapsedTime, TimeSpan timeout)
         {
-            var timeLeft = TimeSpan.FromMilliseconds(millisecondsTimeout) - (DateTime.Now - startDate);
+            var timeLeft = timeout - TimeSpan.FromTicks(elapsedTime.ElapsedTicks);
 
-            if(timeLeft.TotalMilliseconds < 0)
+            if(timeLeft.Ticks < 0)
             {
                 throw new TimeoutException();
             }
 
-            return (int)timeLeft.TotalMilliseconds;
+            return timeLeft;
         }
     }
 }

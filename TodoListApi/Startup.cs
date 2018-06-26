@@ -26,6 +26,7 @@ namespace TodoListApi
             services                
                 .AddSingleton<IStorageContext, StorageContext>()
                 .AddTransient<ITodoListService, TodoListService>()
+                .AddTransient<ITodoListTasksService, TodoListTasksService>()
                 .AddAutoMapper()
                 .AddMvc();
         }

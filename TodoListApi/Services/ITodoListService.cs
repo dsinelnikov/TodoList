@@ -13,9 +13,5 @@ namespace TodoListApi.Services
         Task<TodoList> GetTodoListAsync(Guid id, CancellationToken cancelationToken);
 
         Task AddTodoListAsync(TodoList list, CancellationToken cancelationToken);
-
-        Task AddTaskAsync(Guid listId, TodoListTask task, CancellationToken cancelationToken);
-
-        Task CompleteTaskAsync(Guid id, bool isCompleted, CancellationToken cancelationToken);
     }
 }

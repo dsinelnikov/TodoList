@@ -17,7 +17,8 @@ namespace TodoListApi.ExceptionHandling.Handlers
             {
                 { typeof(ItemExistsException), HttpStatusCode.Conflict },
                 { typeof(ItemNotFoundException), HttpStatusCode.NotFound },
-                { typeof(DataCorruptedException), HttpStatusCode.InternalServerError }
+                { typeof(DataCorruptedException), HttpStatusCode.InternalServerError },
+                { typeof(TimeoutException), HttpStatusCode.InternalServerError }
             };
         }
 
