@@ -1,0 +1,250 @@
+swagger: "2.0"
+info:
+  description: "This is TodoList API. You could find source code [here](https://github.com/dsinelnikov/TodoList)."
+  version: "1.0.0"
+  title: "TodoList"
+  contact:
+    email: "denis.sinelnikov.e@gmail.com"
+host: "localhost:5000"
+basePath: "/"
+schemes:
+- "http"
+paths:
+  /lists:
+    get:
+      summary: "Get all lists"
+      operationId: "getAllLists"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "searchString"
+        in: "query"
+        description: "Only items with contains searchString in name or description will be returned."
+        required: false
+        default: ""
+        type: "string"
+      - name: "skip"
+        in: "query"
+        description: "Number of records to skip for pagination"
+        required: false
+        default: 0
+        type: "integer"
+        format: "int64"
+      - name: "limit"
+        in: "query"
+        description: "Maximum number of records to return"
+        required: false
+        default: 25
+        type: "integer"
+        format: "int64"
+      - name: "includeTasks"
+        in: "query"
+        description: "If true, each list item will contains tasks"
+        required: false
+        default: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/TodoList"
+        400:
+          description: "Invalid parameters format specified"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/InvalidParametersResponse"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+    post:
+      summary: "Add new list"
+      operationId: "addNewList"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "List object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/TodoList"
+      responses:
+        201:
+          description: "Successful operation"
+        400:
+          description: "Invalid parameters format specified"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/InvalidParametersResponse"
+        409:
+          description: "Item is alredy exists."
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+  /lists/{id}:
+    get:
+      summary: "Get list by id"
+      operationId: "getListById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Return a single list by id"
+        required: true
+        type: "string"
+        format: "guid"
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/TodoList"
+        400:
+          description: "Invalid parameters format specified"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/InvalidParametersResponse"
+        404:
+          description: "Item not found"
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+  /lists/{listId}/tasks:
+    post:
+      summary: "Add new task"
+      operationId: "addNewTask"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "listId"
+        in: "path"
+        description: "List id where task must be added"
+        required: true
+        type: "string"
+        format: "guid"
+      - name: "body"
+        in: "body"
+        description: "Task object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/TodoListTask"
+      responses:
+        201:
+          description: "Successful operation"
+        400:
+          description: "Invalid parameters format specified"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/InvalidParametersResponse"
+        409:
+          description: "Item is alredy exists."
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+  /lists/{listId}/tasks/{taskId}/complete:
+    put:
+      summary: "Add new task"
+      operationId: "completeTask"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "listId"
+        in: "path"
+        description: "List id where task is attached"
+        required: true
+        type: "string"
+        format: "guid"
+      - name: "taskId"
+        in: "path"
+        description: "Task id which must be updated"
+        required: true
+        type: "string"
+        format: "guid"
+      - name: "body"
+        in: "body"
+        description: "Task object that needs to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/CompletedTask"
+      responses:
+        201:
+          description: "Successful operation"
+        400:
+          description: "Invalid parameters format specified"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/InvalidParametersResponse"
+        409:
+          description: "Item is alredy exists."
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+        500:
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/GeneralErrorResponse"
+definitions:
+  TodoList:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "guid"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      tasks:
+        type: "array"
+        items:
+          $ref: "#/definitions/TodoListTask"
+  TodoListTask:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "guid"
+      name:
+        type: "string"
+      completed:
+        type: "boolean"
+        default: false
+  CompletedTask:
+    type: "object"
+    properties:
+      completed:
+        type: "boolean"
+  InvalidParametersResponse:
+    type: "object"
+    properties:
+      paramterName:
+        type: "array"
+        items:
+          type: "string"
+  GeneralErrorResponse:
+    type: "object"
+    properties:
+      error:
+        type: "string"
