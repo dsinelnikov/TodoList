@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>TodoList.InMemoryStorage</RootNamespace>
+    <AssemblyName>TodoList.InMemoryStorage</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

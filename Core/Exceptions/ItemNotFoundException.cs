@@ -1,6 +1,6 @@
 using System;
 
-namespace TodoListApi.Core.Exceptions
+namespace TodoList.Core.Exceptions
 {
     public class ItemNotFoundException : Exception
     {

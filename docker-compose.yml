@@ -1,8 +1,7 @@
 version: '3'
 
 services:
-  todolistapi:
-    image: todolistapi
+  api:
     build:
       context: .
-      dockerfile: TodoListApi/Dockerfile
+      dockerfile: Api/Dockerfile

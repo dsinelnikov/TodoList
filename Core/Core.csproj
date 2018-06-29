@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>TodoListApi.Core</AssemblyName>
-    <RootNamespace>TodoListApi.Core</RootNamespace>
+    <AssemblyName>TodoList.Core</AssemblyName>
+    <RootNamespace>TodoList.Core</RootNamespace>
   </PropertyGroup>
 
 </Project>

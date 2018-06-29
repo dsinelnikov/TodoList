@@ -1,22 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Linq;
-using System.Threading.Tasks;
-using TodoListApi.Core.Exceptions;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using TodoList.Core.Exceptions;
 
-namespace InMemoryStorage
+[assembly: InternalsVisibleTo("InMemoryStorage.Tests")]
+
+namespace TodoList.InMemoryStorage
 {
     // I can use ConcurrentDictionary instead of this implementaion. But as I understand it's not interesting for this test task.
     public class EntityStorage<TEntity, TKey> : IEntityStorage<TEntity, TKey>
         where TEntity : class, IEntity<TKey>
     {
-        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(15);
-        private readonly ReaderWriterLockSlim _accessLock = new ReaderWriterLockSlim();
-        private readonly IDictionary<TKey, TEntity> _items = new Dictionary<TKey, TEntity>();
+        private readonly TimeSpan _defaultTimeout;
+        private readonly ReaderWriterLockSlim _accessLock;
+        private readonly IDictionary<TKey, TEntity> _items;
 
-        public async Task Add(TEntity entity, TimeSpan? timeout)
+        public EntityStorage(TimeSpan? defaultTimeout = null)
+        {
+            _defaultTimeout = defaultTimeout ?? TimeSpan.FromSeconds(15);
+            _accessLock = new ReaderWriterLockSlim();
+            _items = new Dictionary<TKey, TEntity>();
+        }
+
+        internal EntityStorage(IDictionary<TKey, TEntity> items, ReaderWriterLockSlim accessLock, TimeSpan defaultTimeout)
+        {
+            _defaultTimeout = defaultTimeout;
+            _items = items;
+            _accessLock = accessLock;
+        }
+
+        public async Task Add(TEntity entity, TimeSpan? timeout = null)
         {
             await Add(entity, CancellationToken.None, timeout);
         }
@@ -52,12 +69,12 @@ namespace InMemoryStorage
             }, cancelationToken);
         }
 
-        public async Task AddRange(IEnumerable<TEntity> entities, TimeSpan? timeout)
+        public async Task AddRange(IEnumerable<TEntity> entities, TimeSpan? timeout = null)
         {
             await AddRange(entities, CancellationToken.None, timeout);
         }
 
-        public async Task AddRange(IEnumerable<TEntity> entities, CancellationToken cancelationToken, TimeSpan? timeout)
+        public async Task AddRange(IEnumerable<TEntity> entities, CancellationToken cancelationToken, TimeSpan? timeout = null)
         {
             if (entities == null)
             {

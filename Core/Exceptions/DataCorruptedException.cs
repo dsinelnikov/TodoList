@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TodoListApi.Core.Exceptions
+namespace TodoList.Core.Exceptions
 {
     public class DataCorruptedException : Exception
     {

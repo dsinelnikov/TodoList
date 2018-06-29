@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{848B0842
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InMemoryStorage.Tests", "Tests\InMemoryStorage.Tests\InMemoryStorage.Tests.csproj", "{43144608-7E68-4AB9-B788-0193385C2EB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Backend", "..\Backend\Backend.csproj", "{55D2771F-ACF5-4A3A-810C-C318CE336E91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.csproj", "{55D2771F-ACF5-4A3A-810C-C318CE336E91}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{94DE856E-103E-494E-B71A-08FD9C133A52}"
 EndProject

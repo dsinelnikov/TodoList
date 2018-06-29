@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace InMemoryStorage
+namespace TodoList.InMemoryStorage
 {
     public interface IEntityStorage<TEntity, TKey>
         where TEntity : class, IEntity<TKey>

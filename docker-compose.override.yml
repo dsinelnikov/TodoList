@@ -1,8 +1,6 @@
 version: '3'
 
 services:
-  todolistapi:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+  api:
     ports:
       - "5000:80"
