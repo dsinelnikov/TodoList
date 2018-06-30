@@ -12,7 +12,7 @@ namespace InMemoryStorage.Tests
 {
     public class EntityStorageTests
     {
-        private readonly EntityStorage<IEntity<int>, int> _storage;
+        private readonly EntityStorage<IEntity<int>, int> _testObject;
         private readonly ReaderWriterLockSlim _accessLock;
         private readonly IDictionary<int, IEntity<int>> _internalStorageItems;
 
@@ -20,14 +20,14 @@ namespace InMemoryStorage.Tests
         {
             _internalStorageItems = new Dictionary<int, IEntity<int>>();
             _accessLock = new ReaderWriterLockSlim();
-            _storage = new EntityStorage<IEntity<int>, int>(_internalStorageItems, _accessLock, TimeSpan.FromMilliseconds(50));
+            _testObject = new EntityStorage<IEntity<int>, int>(_internalStorageItems, _accessLock, TimeSpan.FromMilliseconds(50));
         }
 
         [Fact]        
         public async Task Add_NullEntity()
         {
             // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _storage.Add(null));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _testObject.Add(null));
         }
 
         [Fact]
@@ -35,10 +35,10 @@ namespace InMemoryStorage.Tests
         {
             // Arrange
             var item = new MockEntity(1);
-            await _storage.Add(item);
+            await _testObject.Add(item);
 
             // Act & Assert
-            await Assert.ThrowsAsync<ItemExistsException>(async () => await _storage.Add(item));
+            await Assert.ThrowsAsync<ItemExistsException>(async () => await _testObject.Add(item));
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace InMemoryStorage.Tests
                 }
 
                 // Act & Assert
-                await Assert.ThrowsAsync<TimeoutException>(async () => await _storage.Add(item));
+                await Assert.ThrowsAsync<TimeoutException>(async () => await _testObject.Add(item));
                 assertsCheckedEvent.Set();
             }
         }
@@ -100,7 +100,7 @@ namespace InMemoryStorage.Tests
 
                     testRunThreadEvent.WaitOne();
 
-                    var addTask = _storage.Add(item, TimeSpan.FromSeconds(1));
+                    var addTask = _testObject.Add(item, TimeSpan.FromSeconds(1));
 
                     lockerRunThreadEvent.Set();
                     testRunThreadEvent.WaitOne();
@@ -140,7 +140,7 @@ namespace InMemoryStorage.Tests
 
                     // Act && Assert
                     testRunThreadEvent.WaitOne();
-                    await Assert.ThrowsAsync<TimeoutException>(async () => await _storage.Add(item));
+                    await Assert.ThrowsAsync<TimeoutException>(async () => await _testObject.Add(item));
 
                     lockerRunThreadEvent.Set();
                 }
@@ -176,7 +176,7 @@ namespace InMemoryStorage.Tests
 
                     testRunThreadEvent.WaitOne();
 
-                    var addTask = _storage.Add(item, TimeSpan.FromSeconds(1));
+                    var addTask = _testObject.Add(item, TimeSpan.FromSeconds(1));
 
                     lockerRunThreadEvent.Set();
                     testRunThreadEvent.WaitOne();
@@ -203,7 +203,7 @@ namespace InMemoryStorage.Tests
             tokenSource.Cancel();
 
             // Act & Assert
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await _storage.Add(item, tokenSource.Token));
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await _testObject.Add(item, tokenSource.Token));
         }
 
         [Fact]
@@ -231,7 +231,7 @@ namespace InMemoryStorage.Tests
 
                     // Act && Assert
                     var stopwatch = Stopwatch.StartNew();
-                    await Assert.ThrowsAsync<TimeoutException>(async () => await _storage.Add(item, timeout));
+                    await Assert.ThrowsAsync<TimeoutException>(async () => await _testObject.Add(item, timeout));
                     Assert.True(stopwatch.Elapsed > timeout, "Elapsed time must be more then timeout. Looks like default timeout is used.");
 
                     lockerRunThreadEvent.Set();

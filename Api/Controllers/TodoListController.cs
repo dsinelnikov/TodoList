@@ -35,7 +35,8 @@ namespace TodoList.Controllers
         [HttpGet("{id}")]        
         public async Task<ActionResult<TodoListItem>> GetById(Guid id)
         {
-          return await _listService.GetTodoListAsync(id, HttpContext.RequestAborted);
+          var item = await _listService.GetTodoListAsync(id, HttpContext.RequestAborted);
+          return Ok(item);
         }
 
         [HttpPost]

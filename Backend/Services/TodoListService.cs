@@ -45,7 +45,7 @@ namespace TodoList.Backend.Services
                 cancelationToken.ThrowIfCancellationRequested();
 
                 var listsDic = resultItems.ToDictionary(l => l.Id);
-                var tasks = await _storageContext.Tasks.Get(t => listsDic.Keys.Contains(t.ListId));
+                var tasks = await _storageContext.Tasks.Get(t => listsDic.Keys.Contains(t.ListId), cancelationToken);
 
                 foreach (var list in listsDic.Values)
                 {

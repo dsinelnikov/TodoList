@@ -6,7 +6,7 @@ info:
   contact:
     email: "denis.sinelnikov.e@gmail.com"
 host: "localhost:5000"
-basePath: "/"
+basePath: "/v1/"
 schemes:
 - "http"
 paths:

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TodoList.Core.Exceptions;
 
-[assembly: InternalsVisibleTo("InMemoryStorage.Tests")]
+[assembly: InternalsVisibleTo("TodoList.InMemoryStorage.Tests")]
 
 namespace TodoList.InMemoryStorage
 {

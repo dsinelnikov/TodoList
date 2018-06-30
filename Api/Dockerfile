@@ -11,6 +11,8 @@ COPY ./Api/Api.csproj Api/
 
 # Copy tests csproj
 COPY ./Tests/InMemoryStorage.Tests/InMemoryStorage.Tests.csproj Tests/InMemoryStorage.Tests/
+COPY ./Tests/Backend.Tests/Backend.Tests.csproj Tests/Backend.Tests/
+COPY ./Tests/Api.Tests/Api.Tests.csproj Tests/Api.Tests/
 
 
 RUN dotnet restore TodoList.sln

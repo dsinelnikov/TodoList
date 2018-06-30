@@ -2,7 +2,7 @@
 This api was created as Todo List example. You could look api specification [here](https://app.swaggerhub.com/apis/dsinelnikov/TodoListApi/1.0.0#/default/completeTask) 
 
 # Requirements
-  - .NET Core 2.1 SDK [https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.300-preview1]
+  - .NET Core 2.1 SDK [https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.301]
     
 # Run from Visual Studio
   - Open *TodoListApi.sln* file in Visual Studio. 
