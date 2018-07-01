@@ -86,6 +86,7 @@ namespace TodoList.Backend.Services
             try
             {
                 var dseTasks = _mapper.Map<List<Dse.TodoListTask>>(list.Tasks);
+                dseTasks.ForEach(t => t.ListId = list.Id);
 
                 await _storageContext.Tasks.AddRange(dseTasks, cancelationToken);
             }
