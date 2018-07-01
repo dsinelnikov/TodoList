@@ -5,10 +5,11 @@ info:
   title: "TodoList"
   contact:
     email: "denis.sinelnikov.e@gmail.com"
-host: "localhost:5000"
+host: "testapp-todolistapi.azurewebsites.net"
 basePath: "/v1/"
 schemes:
 - "http"
+- "https"
 paths:
   /lists:
     get:
